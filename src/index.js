@@ -25,27 +25,7 @@ refs.catsInfoDiv.classList.add(IS_HIDDEN);
 
 refs.breedSelect.addEventListener('change', handleSelectedCatInfoChange);
 
-fetchBreeds()
-  .then(breeds => {
-    refs.breedSelect.insertAdjacentHTML(
-      'beforeend',
-      createOptionsCatMarkup(breeds.data)
-    );
-
-    new SlimSelect({
-      select: '#single',
-      settings: {
-        placeholderText: 'Choose your favorite cat',
-      },
-    });
-
-    refs.infoLoader.classList.add(IS_HIDDEN);
-    refs.breedSelect.classList.remove(IS_HIDDEN);
-  })
-  .catch(() => {
-    refs.infoLoader.classList.add(IS_HIDDEN);
-    Notify.warning('Oops! Something went wrong! Try reloading the page!');
-  });
+processFetchedBreeds();
 
 function handleSelectedCatInfoChange(event) {
   const selectedCatIndex = event.currentTarget.selectedIndex;
@@ -55,6 +35,34 @@ function handleSelectedCatInfoChange(event) {
   refs.catsInfoDiv.classList.add(IS_HIDDEN);
   refs.catsInfoDiv.innerHTML = '';
 
+  processFetchedCatByBreed(selectedId);
+}
+
+function processFetchedBreeds() {
+  fetchBreeds()
+    .then(breeds => {
+      refs.breedSelect.insertAdjacentHTML(
+        'beforeend',
+        createOptionsCatMarkup(breeds.data)
+      );
+
+      new SlimSelect({
+        select: '#single',
+        settings: {
+          placeholderText: 'Choose your favorite cat',
+        },
+      });
+
+      refs.infoLoader.classList.add(IS_HIDDEN);
+      refs.breedSelect.classList.remove(IS_HIDDEN);
+    })
+    .catch(() => {
+      refs.infoLoader.classList.add(IS_HIDDEN);
+      Notify.warning('Oops! Something went wrong! Try reloading the page!');
+    });
+}
+
+function processFetchedCatByBreed(selectedId) {
   fetchCatByBreed(selectedId)
     .then(cat => {
       refs.infoLoader.classList.add(IS_HIDDEN);
