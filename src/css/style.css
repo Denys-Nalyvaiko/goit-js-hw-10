@@ -1,0 +1,54 @@
+body {
+  background-image: url('../images/cat-background.jpg');
+  background-repeat: no-repeat;
+  background-position: initial;
+
+  color: #fafafa;
+}
+
+.is-hidden {
+  display: none;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.breed-select {
+  position: absolute;
+  right: 15%;
+  top: 7%;
+  width: 300px;
+  color: #fafafa;
+  background-color: #252525;
+}
+
+.ss-content .ss-list .ss-option {
+  color: #fafafa90;
+}
+
+.ss-content .ss-list .ss-option:hover,
+.ss-content .ss-list .ss-option:focus,
+.ss-content .ss-list .ss-option.ss-highlighted,
+.ss-content .ss-list .ss-option:not(.ss-disabled).ss-selected {
+  color: #252525;
+  background-color: #fafafa;
+}
+
+.cat-info {
+  margin: 40px 100px;
+  padding: 10px;
+  border: 3px solid #fafafa;
+  max-width: 600px;
+  box-shadow: 10px 10px 14px 0px #fafafa;
+}
+
+.cat-img {
+  max-width: 600px;
+  display: block;
+  margin: 0 auto;
+}
+
+.cat-description span,
+.cat-temperament span {
+  font-style: italic;
+  font-weight: 700;
+}

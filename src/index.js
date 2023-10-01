@@ -1,10 +1,27 @@
 import { fetchBreeds } from './js/cat-api';
 import { fetchCatByBreed } from './js/cat-api';
+import { createCatInfoMarkup } from './js/templates/cat-info-markup';
+import { createOptionsCatMarkup } from './js/templates/cat-options-markup';
+import SlimSelect from 'slim-select';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
 const refs = {
-  breedSelect: document.querySelector('.breed-select'),
-  catsInfoDiv: document.querySelector('.cat-info'),
+  breedSelect: document.querySelector('.js-breed-select'),
+  catsInfoDiv: document.querySelector('.js-cat-info'),
+  infoLoader: document.querySelector('.js-loader'),
 };
+const IS_HIDDEN = 'is-hidden';
+
+Notify.init({
+  position: 'center-top',
+  distance: '45px',
+  timeout: 2000,
+  cssAnimationStyle: 'zoom',
+  fontFamily: 'Arial, sans-serif',
+});
+
+refs.breedSelect.classList.add(IS_HIDDEN);
+refs.catsInfoDiv.classList.add(IS_HIDDEN);
 
 refs.breedSelect.addEventListener('change', handleSelectedCatInfoChange);
 
@@ -14,35 +31,38 @@ fetchBreeds()
       'beforeend',
       createOptionsCatMarkup(breeds.data)
     );
+
+    new SlimSelect({
+      select: '#single',
+      settings: {
+        placeholderText: 'Choose your favorite cat',
+      },
+    });
+
+    refs.infoLoader.classList.add(IS_HIDDEN);
+    refs.breedSelect.classList.remove(IS_HIDDEN);
   })
-  .catch(error => console.log(error));
+  .catch(() => {
+    refs.infoLoader.classList.add(IS_HIDDEN);
+    Notify.warning('Oops! Something went wrong! Try reloading the page!');
+  });
 
 function handleSelectedCatInfoChange(event) {
-  const selectedIndex = event.currentTarget.selectedIndex;
-  const selectedId = event.currentTarget[selectedIndex].value;
-  console.dir(event.currentTarget[selectedIndex].value);
+  const selectedCatIndex = event.currentTarget.selectedIndex;
+  const selectedId = event.currentTarget[selectedCatIndex].value;
+
+  refs.infoLoader.classList.remove(IS_HIDDEN);
+  refs.catsInfoDiv.classList.add(IS_HIDDEN);
+  refs.catsInfoDiv.innerHTML = '';
 
   fetchCatByBreed(selectedId)
-    .then(
-      cat => (refs.catsInfoDiv.innerHTML = createCatInfoMarkup(cat.data[0]))
-    )
-    .catch(error => console.log(error));
-}
-
-function createOptionsCatMarkup(breeds) {
-  return breeds.map(breed => createOptionCatMarkup(breed)).join('');
-}
-
-function createOptionCatMarkup({ id, name }) {
-  return `<option value="${id}">${name}</option>`;
-}
-
-function createCatInfoMarkup({ breeds, url }) {
-  const { name, description, temperament } = breeds[0];
-  return `
-      <img src="${url}" alt="${name}" width=600>
-      <h2>${name}</h2>
-      <p>${description}</p>
-      <p>${temperament}</p>
-  `;
+    .then(cat => {
+      refs.infoLoader.classList.add(IS_HIDDEN);
+      refs.catsInfoDiv.classList.remove(IS_HIDDEN);
+      refs.catsInfoDiv.innerHTML = createCatInfoMarkup(cat.data[0]);
+    })
+    .catch(() => {
+      refs.catsInfoDiv.classList.add(IS_HIDDEN);
+      Notify.warning('Oops! Something went wrong! Try reloading the page!');
+    });
 }
